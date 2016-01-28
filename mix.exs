@@ -7,6 +7,7 @@ defmodule MixInstall.Mixfile do
      elixir: "~> 1.2",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     name: "mix install",
      deps: deps]
   end
 
@@ -27,6 +28,8 @@ defmodule MixInstall.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [
+      {:dogma, only: ~w(dev test)a},
+    ]
   end
 end
