@@ -1,0 +1,2 @@
+defmodule MixInstall do
+end
