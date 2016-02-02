@@ -4,10 +4,6 @@ defmodule MixInstallTest do
 
   doctest Install
 
-  test "the truth" do
-    assert 1 + 1 == 2
-  end
-
   test "Extarct package version" do
     data = """
     ar2ecto                0.1.2
@@ -19,5 +15,9 @@ defmodule MixInstallTest do
     ecto_audit             0.0.1
     """
      assert {:ok, "1.1.3"} == Install.get_version(data, "ecto")
+  end
+
+  test "Mix writter" do
+    Install.write_mix("mix.exs", "foo")
   end
 end
