@@ -10,37 +10,39 @@ defmodule Mix.Tasks.Install do
   @mix_file_name "mix.exs"
 
   @spec get_version(String.t, String.t) :: String.t
-  def get_version(data, package) do
-    lines = String.split(data, "\n")
-    line? = Enum.filter(lines, &String.starts_with?(&1, package) )
-    packages = Enum.map(line?, fn arg ->
-      [name, version] = String.split(arg, ~r{\s+})
-      {name, version}
-    end)
-    matched = Enum.filter(packages, fn {name, _} ->
-       name == package
-    end)
-    case matched do
-      [] -> :error
-      [{_, version}] -> {:ok, version}
-    end
+  def get_version(packages, package) do
+    # lines = String.split(data, "\n")
+    # line? = Enum.filter(lines, &String.starts_with?(&1, package) )
+    # packages = Enum.map(line?, fn arg ->
+    #   [name, version] = String.split(arg, ~r{\s+})
+    #   {name, version}
+    # end)
+    # matched = Enum.filter(packages, fn {name, _} ->
+    #    name == package
+    # end)
+    # case matched do
+    #   [] -> :error
+    #   [{_, version}] -> {:ok, version}
+    # end
   end
 
-  def write_mix(filename, dependency) do
-    readlines(filename)
-    |> find_deps_position()
-    |> inspect |> IO.puts()
+  def write_mix(filename, {name, version}) do
+    lines = readlines(filename)
+    position = find_deps_position(lines)
+    insert(lines, position, name, version)
+    |> write_lines(filename)
+    |> inspect()
+    |> IO.puts()
   end
 
   def run(package) do
-     package
-     |> inspect
-     |> IO.puts
      Mix.shell.info "rly? #{package}"
+     packages = Hex.Registry.search(package)
 
-     packages = Mix.Task.run "hex.search", [package]
-     get_version(packages, package)
-
+     Enum.each(package, fn pkg ->
+       version = Hex.Registry.get_versions(pkg) |> List.last()
+       write_mix(@mix_file_name, {pkg, version})
+     end)
      Mix.Task.run "deps.get", []
   end
 
@@ -66,5 +68,14 @@ defmodule Mix.Tasks.Install do
       true -> pos
       _ -> find_end(tail, pos + 1)
     end
+  end
+
+  defp insert(lines, pos, name, version) do
+    # todo: indent
+    List.insert_at(lines, pos, "      {:#{name}, \"~> #{version}\"},")
+  end
+
+  defp write_lines(lines, filename) do
+    File.write!(filename, Enum.join(lines, "\n"))
   end
 end
