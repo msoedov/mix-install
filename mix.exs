@@ -30,6 +30,7 @@ defmodule MixInstall.Mixfile do
   defp deps do
     [
       {:dogma, only: ~w(dev test)a},
+      {:mix_test_watch, "~> 0.2.5"}
     ]
   end
 end
