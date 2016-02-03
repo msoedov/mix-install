@@ -4,8 +4,10 @@ defmodule MixInstallTest do
 
   doctest Install
 
-  test "Extarct package version" do
-
+  test "validation" do
+    pkgs = ["whatever", "foo", "ecto", "bar"]
+    expected = {:error, ["whatever", "foo", "bar"]}
+    assert expected == Install.validate!(pkgs)
   end
 
   test "Mix writter" do

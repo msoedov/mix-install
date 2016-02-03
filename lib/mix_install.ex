@@ -12,8 +12,12 @@ defmodule Mix.Tasks.Install do
   def run(package) do
      # arg parser
      # validation
-     Mix.shell.info "rly? #{package}"
-     packages = Hex.Registry.search(package)
+
+     case validate!(package) do
+       :ok -> nil
+       {:error, names} -> IO.puts(names); System.halt(1)
+     end
+
 
      deps = Enum.map(package, fn pkg ->
        version = Hex.Registry.get_versions(pkg) |> List.last()
@@ -26,6 +30,21 @@ defmodule Mix.Tasks.Install do
 
      Mix.Task.run "deps.get", []
      :ok
+  end
+
+  def validate!(packages) do
+      errors = Enum.reduce(packages, [], fn(p, acc) ->
+          suggested = Hex.Registry.search(p)
+          if Enum.member?(suggested, p) do
+             acc
+          else
+             acc ++ [p]
+          end
+      end)
+      case errors do
+        [] -> :ok
+        e -> {:error, errors}
+      end
   end
 
   def write_mix(filename, {name, version}) do
