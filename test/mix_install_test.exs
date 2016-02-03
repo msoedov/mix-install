@@ -6,8 +6,8 @@ defmodule MixInstallTest do
 
   test "validation" do
     pkgs = ["whatever", "foo", "ecto", "bar"]
-    expected = {:error, ["whatever", "foo", "bar"]}
-    assert expected == Install.validate!(pkgs)
+    expected = {:invalid, ["whatever", "foo", "bar"]}
+    assert expected == Install.validate(pkgs)
   end
 
   test "Mix writter" do

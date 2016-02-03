@@ -13,9 +13,9 @@ defmodule Mix.Tasks.Install do
      # arg parser
      # validation
 
-     case validate!(package) do
+     case validate(package) do
        :ok -> nil
-       {:error, names} -> IO.puts(names); System.halt(1)
+       {:invalid, names} -> IO.puts(names); System.halt(1)
      end
 
 
@@ -32,7 +32,7 @@ defmodule Mix.Tasks.Install do
      :ok
   end
 
-  def validate!(packages) do
+  def validate(packages) do
       errors = Enum.reduce(packages, [], fn(p, acc) ->
           suggested = Hex.Registry.search(p)
           if Enum.member?(suggested, p) do
@@ -43,8 +43,12 @@ defmodule Mix.Tasks.Install do
       end)
       case errors do
         [] -> :ok
-        e -> {:error, errors}
+        e -> {:invalid, e}
       end
+  end
+
+  def suggest() do
+
   end
 
   def write_mix(filename, {name, version}) do
