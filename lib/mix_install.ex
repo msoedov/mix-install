@@ -15,7 +15,7 @@ defmodule Mix.Tasks.Install do
 
      case validate(package) do
        :ok -> nil
-       {:invalid, names} -> IO.puts(names); System.halt(1)
+       {:invalid, names} -> suggest(names); System.halt(1)
      end
 
 
@@ -47,8 +47,16 @@ defmodule Mix.Tasks.Install do
       end
   end
 
-  def suggest() do
-
+  @spec suggest([String.t]) :: any()
+  def suggest(packages) do
+    Enum.each(packages, fn p ->
+       suggested = Hex.Registry.search(p)
+       IO.puts("Package #{p} was not found")
+       if suggested != [] do
+          suggested = Enum.join(suggested, " ")
+          IO.puts("Maybe you meant: #{suggested}")
+       end
+    end)
   end
 
   def write_mix(filename, {name, version}) do

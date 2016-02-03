@@ -4,10 +4,16 @@ defmodule MixInstallTest do
 
   doctest Install
 
-  test "validation" do
+  test "validation when :invalid" do
     pkgs = ["whatever", "foo", "ecto", "bar"]
     expected = {:invalid, ["whatever", "foo", "bar"]}
     assert expected == Install.validate(pkgs)
+  end
+
+  test "validation when :ok" do
+    pkgs = ["dogma", "ecto", ]
+    assert :ok == Install.validate(pkgs)
+
   end
 
   test "Mix writter" do
