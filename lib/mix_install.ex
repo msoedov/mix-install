@@ -10,8 +10,8 @@ defmodule Mix.Tasks.Install do
   @mix_file_name "mix.exs"
 
   def run(package) do
-     # arg parser
-     # validation
+     # todo: arg parser
+     # todo: validation
 
      case validate(package) do
        :ok -> nil
