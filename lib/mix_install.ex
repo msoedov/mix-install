@@ -15,12 +15,12 @@ defmodule Mix.Tasks.Install do
 
      case validate(package) do
        :ok -> nil
-       {:invalid, names} -> suggest(names); System.halt(1)
+       {:invalid, names} ->  names |> suggest |> panic
      end
 
 
      deps = Enum.map(package, fn pkg ->
-       version = Hex.Registry.get_versions(pkg) |> List.last()
+       version = pkg |> Hex.Registry.get_versions |> List.last
        {pkg, version}
      end)
 
@@ -47,7 +47,7 @@ defmodule Mix.Tasks.Install do
       end
   end
 
-  @spec suggest([String.t]) :: any()
+  @spec suggest([String.t]) :: String.t
   def suggest(packages) do
     Enum.each(packages, fn p ->
        suggested = Hex.Registry.search(p)
@@ -57,19 +57,21 @@ defmodule Mix.Tasks.Install do
           IO.puts("Maybe you meant: #{suggested}")
        end
     end)
+    ""
   end
 
   def write_mix(filename, {name, version}) do
     lines = readlines(filename)
-    position = find_deps_position(lines)
-    insert(lines, position, name, version)
+    lines
+    |> find_deps_position
+    |> insert(lines, name, version)
     |> write_lines(filename)
   end
 
   defp readlines(filename) do
     case File.read(filename) do
       {:ok, content} -> String.split(content, "\n")
-      {:error, _} -> IO.puts "Error: mix file not found"; System.halt(1)
+      {:error, _} -> panic "Error: mix file was not found"
     end
   end
 
@@ -90,12 +92,17 @@ defmodule Mix.Tasks.Install do
     end
   end
 
-  defp insert(lines, pos, name, version) do
+  defp insert(pos, lines, name, version) do
     # todo: indent
     List.insert_at(lines, pos, "      {:#{name}, \"~> #{version}\"},")
   end
 
   defp write_lines(lines, filename) do
     File.write!(filename, Enum.join(lines, "\n"))
+  end
+
+  def panic(msg) do
+      IO.puts msg
+      System.halt(1)
   end
 end
