@@ -12,6 +12,9 @@ defmodule Mix.Tasks.Install do
   def run(package) do
      # todo: arg parser
      # todo: validation
+     # todo: mix file exists?
+     # todo: dep already installed
+     # todo: test gen
 
      case validate(package) do
        :ok -> nil
@@ -62,10 +65,23 @@ defmodule Mix.Tasks.Install do
 
   def write_mix(filename, {name, version}) do
     lines = readlines(filename)
+    if installed?(lines, name) do
+      panic("Package #{name} is already in mix.exs. Need to update version?")
+    end
     lines
     |> find_deps_position
     |> insert(lines, name, version)
     |> write_lines(filename)
+  end
+
+  def panic(msg) do
+      IO.puts msg
+      System.halt(1)
+  end
+
+  def installed? lines, pkg do
+    Enum.filter(lines, &Regex.match?(~r{^\s+\{\:#{pkg}.*}, &1) )
+    |> Enum.any?()
   end
 
   defp readlines(filename) do
@@ -101,8 +117,4 @@ defmodule Mix.Tasks.Install do
     File.write!(filename, Enum.join(lines, "\n"))
   end
 
-  def panic(msg) do
-      IO.puts msg
-      System.halt(1)
-  end
 end

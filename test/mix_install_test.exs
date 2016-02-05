@@ -16,7 +16,22 @@ defmodule MixInstallTest do
 
   end
 
-  test "Mix writter" do
-    # Install.write_mix("mix.exs", {"ecto", "0.5.0"})
+  test "installed? for empty deps" do
+    assert false == Install.installed?([], "ecto")
+  end
+
+  test "installed? should be false "  do
+    assert false == Install.installed?(["    {:dogma, only: ~w(dev test)a}",
+          "  {:mix_test_watch, \"~> 0.2.5\"}",], "ecto")
+  end
+
+  test "installed? should be true" do
+    assert true == Install.installed?(["    {:dogma, only: ~w(dev test)a}",
+          "  {:ecto, \"~> 0.2.5\"}",], "ecto")
+  end
+
+  test "installed? when commented" do
+    assert false == Install.installed?(["  \#{:ecto, \"~> 0.2.5\"}",], "ecto")
+    assert false == Install.installed?(["  \#  {:ecto, \"~> 0.2.5\"}",], "ecto")
   end
 end
