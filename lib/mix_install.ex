@@ -1,5 +1,7 @@
 defmodule Mix.Tasks.Install do
+  alias Mix.Tasks.Install.CLI
   use Mix.Task
+
   @shortdoc """
   TBD
   """
@@ -9,20 +11,21 @@ defmodule Mix.Tasks.Install do
 
   @mix_file_name "mix.exs"
 
-  def run(package) do
+  def run(args) do
      # todo: arg parser
      # todo: validation
      # todo: mix file exists?
      # todo: dep already installed
      # todo: test gen
 
-     case validate(package) do
+     {flags, packages} = CLI.parse(args)
+     case validate(packages) do
        :ok -> nil
        {:invalid, names} ->  names |> suggest |> panic
      end
 
 
-     deps = Enum.map(package, fn pkg ->
+     deps = Enum.map(packages, fn pkg ->
        version = pkg |> Hex.Registry.get_versions |> List.last
        {pkg, version}
      end)
@@ -88,7 +91,8 @@ defmodule Mix.Tasks.Install do
   end
 
   def installed? lines, pkg do
-    Enum.filter(lines, &Regex.match?(~r{^\s+\{\:#{pkg}.*}, &1) )
+    lines
+    |> Enum.filter(&Regex.match?(~r/^\s+\{\:#{pkg}.*/, &1) )
     |> Enum.any?()
   end
 
