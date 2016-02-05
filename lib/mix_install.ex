@@ -31,7 +31,10 @@ defmodule Mix.Tasks.Install do
           write_mix(@mix_file_name, dep)
      end)
 
-     Mix.Task.run "deps.get", []
+     Mix.Shell.cmd("mix deps.get", fn data ->
+       IO.puts(data)
+     end)
+     IO.puts("Done.")
      :ok
   end
 
@@ -66,17 +69,22 @@ defmodule Mix.Tasks.Install do
   def write_mix(filename, {name, version}) do
     lines = readlines(filename)
     if installed?(lines, name) do
-      panic("Package #{name} is already in mix.exs. Need to update version?")
+      error("Package #{name} is already in mix.exs. Need to update version?")
+    else
+      lines
+      |> find_deps_position
+      |> insert(lines, name, version)
+      |> write_lines(filename)
     end
-    lines
-    |> find_deps_position
-    |> insert(lines, name, version)
-    |> write_lines(filename)
+  end
+
+  def error(msg) do
+    IO.puts msg
   end
 
   def panic(msg) do
-      IO.puts msg
-      System.halt(1)
+    error msg
+    System.halt(1)
   end
 
   def installed? lines, pkg do
