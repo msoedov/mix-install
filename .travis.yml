@@ -16,6 +16,6 @@ notifications:
   email: true
 
 script:
-  - mix compile --warnings-as-errors
+  - mix compile
   - mix test
   - mix dogma

@@ -1,4 +1,5 @@
-# MixInstall (Beta)
+# MixInstall (Beta) [![Build Status](https://travis-ci.org/msoedov/mix-install.svg?branch=master)](https://travis-ci.org/msoedov/mix-install)
+
 
 An alternative way of adding dependencies to your Elixir project with mix (Similar to gem/pip install for dev environment)
 
@@ -43,4 +44,4 @@ TBD
 
 ## Should I use it?
 
-This tooling may be not an `idiomatic` way for Elixir and opposite to good practices I'm not sure about it. Please open an issue or notify me if you see code that smells bad. 
+This tooling may be not an `idiomatic` way for Elixir and opposite to good practices I'm not sure about it. Please open an issue or notify me if you see code that smells bad.
