@@ -1,6 +1,6 @@
 # MixInstall (Beta)
 
-An alternative way of adding dependencies to your Elixir project with mix (Similar to gem/pip install)
+An alternative way of adding dependencies to your Elixir project with mix (Similar to gem/pip install for dev environment)
 
 Usage
 -----
@@ -38,16 +38,9 @@ end
 
 TBD
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+## Todos
 
-  1. Add mix_install to your list of dependencies in `mix.exs`:
 
-        def deps do
-          [{:mix_install, "~> 0.0.1"}]
-        end
+## Should I use it?
 
-  2. Ensure mix_install is started before your application:
-
-        def application do
-          [applications: [:mix_install]]
-        end
+This tooling may be not an `idiomatic` way for Elixir and opposite to good practices I'm not sure about it. Please open an issue or notify me if you see code that smells bad. 
