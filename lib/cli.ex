@@ -15,14 +15,13 @@ defmodule Mix.Tasks.Install.CLI do
     @options [t: :test, g: :github, d: :dev, h: :help]
 
     def parse(args) do
-      {flags, packages, errors} = OptionParser.parse(args, aliases: @options)
-      IO.puts(inspect(flags))
-      IO.puts(inspect(errors))
-      if errors == [] or flags.help do
-          raise @moduledoc
-      else
-        {flags, packages}
-      end
+      {flags, packages, _} = OptionParser.parse(args, aliases: @options)
+
+      # if flags.help do
+          # raise @moduledoc
+      # else
+        {Enum.sort(flags), packages}
+      # end
 
     end
 

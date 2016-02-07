@@ -31,7 +31,7 @@ defmodule Mix.Tasks.Install do
      end)
 
      Enum.map(deps, fn dep ->
-          write_mix(@mix_file_name, dep)
+          write_mix(@mix_file_name, dep, flags)
      end)
 
      Mix.Shell.cmd("mix deps.get", fn data ->
@@ -69,14 +69,14 @@ defmodule Mix.Tasks.Install do
     ""
   end
 
-  def write_mix(filename, {name, version}) do
+  def write_mix(filename, {name, version}, flags) do
     lines = readlines(filename)
     if installed?(lines, name) do
       error("Package #{name} is already in mix.exs. Need to update version?")
     else
       lines
       |> find_deps_position
-      |> insert(lines, name, version)
+      |> insert(lines, {name, version}, flags)
       |> write_lines(filename)
     end
   end
@@ -94,6 +94,32 @@ defmodule Mix.Tasks.Install do
     lines
     |> Enum.filter(&Regex.match?(~r/^\s+\{\:#{pkg}.*/, &1) )
     |> Enum.any?()
+  end
+
+  def opt_line(opts, pkg)do
+    opt_line(opts, pkg, "")
+  end
+  def opt_line([{:dev, true}, {:test, true} | tail], pkg, line) do
+    opt_line(tail, pkg, line <> " only: ~w(dev test)a,")
+  end
+  def opt_line([{:git, true} | tail], pkg, line) do
+    opt_line(tail, pkg, line <> " git: https://github.com/#{pkg}.git,")
+  end
+  def opt_line([{:test, true} | tail], pkg, line) do
+    opt_line(tail, pkg, line <> " only: test,")
+  end
+  def opt_line([{:dev, true} | tail], pkg, line) do
+    opt_line(tail, pkg, line <> " only: dev,")
+  end
+  def opt_line(_, _, line) do
+    line
+    |> stripify
+  end
+
+  defp stripify(s) do
+    s
+    |> String.strip()
+    |> String.rstrip(?,)
   end
 
   defp readlines(filename) do
@@ -120,9 +146,11 @@ defmodule Mix.Tasks.Install do
     end
   end
 
-  defp insert(pos, lines, name, version) do
+  defp insert(pos, lines, {name, version}, opts) do
     # todo: indent
-    List.insert_at(lines, pos, "      {:#{name}, \"~> #{version}\"},")
+    options = opt_line(opts, name)
+    dep_line = "      {:#{name}, \"~> #{version}\", #{options}},"
+    List.insert_at(lines, pos, dep_line)
   end
 
   defp write_lines(lines, filename) do

@@ -22,16 +22,26 @@ defmodule MixInstallTest do
 
   test "installed? should be false "  do
     refute Install.installed?(["    {:dogma, only: ~w(dev test)a}",
-          "  {:mix_test_watch, \"~> 0.2.5\"}",], "ecto")
+          ~s(  {:mix_test_watch, "~> 0.2.5"}),], "ecto")
   end
 
   test "installed? should be true" do
     assert Install.installed?(["    {:dogma, only: ~w(dev test)a}",
-          "  {:ecto, \"~> 0.2.5\"}",], "ecto")
+          ~s(  {:ecto, "~> 0.2.5"}),], "ecto")
   end
 
   test "installed? when commented" do
-    refute Install.installed?(["  \#{:ecto, \"~> 0.2.5\"}",], "ecto")
-    refute Install.installed?(["  \#  {:ecto, \"~> 0.2.5\"}",], "ecto")
+    refute Install.installed?([~s(  \#{:ecto, "~> 0.2.5"}),], "ecto")
+    refute Install.installed?([~s(  #  {:ecto, "~> 0.2.5"}),], "ecto")
+  end
+
+  test "opt_line -d -t" do
+     assert "only: ~w(dev test)a" ==
+        Install.opt_line([dev: true, test: true, foo: 2], "whatever")
+  end
+
+  test "opt_line -g elixir-lang/foobar" do
+     assert "git: https://github.com/elixir-lang/foobar.git, only: test" ==
+            Install.opt_line([git: true, test: true], "elixir-lang/foobar")
   end
 end
